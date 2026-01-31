@@ -17,3 +17,4 @@ typedef struct s_complex_float
 #define cplx_sub(r, x, y) ((r).real = (x).real - (y).real, (r).imag = (x).imag - (y).imag)
 #define cplx_mul(r, x, y) ((r).real = (x).real * (y).real - (x).imag * (y).imag, (r).imag = (x).real * (y).imag + (x).imag * (y).real)
 #define cplx_conj(r, x) ((r).real = (x).real, (r).imag = -(x).imag)
+#define cplx_neg(x) ((x).real = -(x).real, (x).imag = -(x).imag)
