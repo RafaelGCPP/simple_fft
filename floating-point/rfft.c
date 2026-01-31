@@ -59,7 +59,7 @@ void rfft_core(float *data, int n, float *twiddle, int *bitrev, int direction)
         // odd1 = (cdata[n / 2 - i] - conj(cdata[i])) / 2;  == -conj(odd1)
 
 
-        cplx tmp1, tmp;
+        cplx tmp;
         cplx_conj(tmp, cdata[n/2 - i]); // tmp = conj(cdata[i])
         cplx_add(even, cdata[i], tmp);
         cplx_half(even);
@@ -79,9 +79,8 @@ void rfft_core(float *data, int n, float *twiddle, int *bitrev, int direction)
         //                  = conj(even) + i * conj (odd * w)
 
         // we will build I * odd * w as tmp
-        cplx_mul(tmp1, odd, twd[i]);
-        tmp.real = -tmp1.imag;
-        tmp.imag = tmp1.real;
+        cplx_mul(tmp, odd, twd[i]);
+        cplx_times_j(tmp); // tmp = I * odd * w
 
         if (direction == 1)
         {
