@@ -45,10 +45,10 @@ void rfft_core(float *data, int n, float *twiddle, int *bitrev, int direction)
         cdata[0]=tmp;
     }
 
-    if (direction == 1) {
+    //if (direction == 1) {
         cplx tmp=cdata[n / 4];
         cplx_conj(cdata[n / 4], tmp);
-    }
+    //} 
 
     for (int i = 1; i < n / 4; i++)
     {
@@ -74,16 +74,19 @@ void rfft_core(float *data, int n, float *twiddle, int *bitrev, int direction)
         // cdata[n / 2 - i] = even1 - I * odd1 * w1;
         //                  = conj(even) - i * conj (odd * w)
         // In inverse transform
+        // w= conj(twd[i])
         // cdata[i] = even + I * odd * w;
         // cdata[n / 2 - i] = even1 + I * odd1 * w1;
         //                  = conj(even) + i * conj (odd * w)
 
-        // we will build I * odd * w as tmp
-        cplx_mul(tmp, odd, twd[i]);
-        cplx_times_j(tmp); // tmp = I * odd * w
+
 
         if (direction == 1)
         {
+            // we will build I * odd * w as tmp
+            cplx_mul(tmp, odd, twd[i]);
+            cplx_times_j(tmp); // tmp = I * odd * w
+
             // cdata[i] = even - I * odd * w;
             cplx_sub(cdata[i], even, tmp);
 
@@ -97,16 +100,21 @@ void rfft_core(float *data, int n, float *twiddle, int *bitrev, int direction)
         }
         else
         {
-            // cdata[i] = even - I * odd * w;
-            cplx_add(cdata[i], even, tmp);
 
-            // tmp= I * odd1 * w1 = I * conj (tmp1)
-            tmp.real = -tmp.real;
-            
-            // cdata[n / 2 - i] = even1 - I * odd1 * w1;
-            // = conj(even) - i * conj (odd * w)
+            // we will build I * odd * w as tmp
+            cplx w;
+            cplx_conj(w, twd[i]);
+            cplx_mul(tmp, odd, w);
+            cplx_times_j(tmp); // tmp = I * odd * w
+            // cdata[i] = even + I * odd * w;
+            cplx_add(cdata[i], even, tmp);
+           
+            // cdata[n / 2 - i] = even1 + I * odd1 * w1;
+            // = conj(even) + i * conj (odd * w)
             cplx_conj(even, even);
+            tmp.real = -tmp.real;   
             cplx_add(cdata[n / 2 - i], even, tmp);
+
         }
     }
     if (direction == -1)
