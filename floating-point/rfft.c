@@ -45,11 +45,8 @@ void rfft_core(float *data, int n, float *twiddle, int *bitrev, int direction)
         cdata[0]=tmp;
     }
 
-    //if (direction == 1) {
-        cplx tmp=cdata[n / 4];
-        cplx_conj(cdata[n / 4], tmp);
-    //} 
-
+    cplx_conj(cdata[n / 4],cdata[n / 4]);
+    
     for (int i = 1; i < n / 4; i++)
     {
         // Symmetries!
