@@ -41,14 +41,10 @@ void radix_2_dit_fft(float *data, int n, float *twiddle, int *bitrev, int ts, in
                 cplx a, b, w;
                 int index = j + i;
 
-                w.real = twd[i * tw_index * ts].real;
-                w.imag = twd[i * tw_index * ts].imag;
+                w=twd[i * tw_index * ts];
 
-                a.real = cdata[index].real;
-                a.imag = cdata[index].imag;
-
-                b.real = cdata[index + stride].real;
-                b.imag = cdata[index + stride].imag;
+                a=cdata[index];
+                b=cdata[index + stride];
 
                 if (direction == -1 && stride == 1)
                 {
