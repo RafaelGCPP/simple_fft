@@ -45,14 +45,9 @@ void radix_2_dit_fft_fix(int *data, int l2n, int *twiddle, int *bitrev, int ts, 
                 int index = j + i;
                 int ti = i * tw_index;
 
-                w.real = twd[ti * ts].real;
-                w.imag = twd[ti * ts].imag;
-
-                a.real = cdata[index].real;
-                a.imag = cdata[index].imag;
-
-                b.real = cdata[index + stride].real;
-                b.imag = cdata[index + stride].imag;
+                w=twd[ti * ts];
+                a=cdata[index];
+                b=cdata[index + stride];
 
                 if (direction == -1 && stride == 1)
                 {
@@ -82,13 +77,8 @@ void radix_2_dit_fft_fix(int *data, int l2n, int *twiddle, int *bitrev, int ts, 
 
                 if (direction == -1)
                 {
-                    // cplx_scale(cdata[index], 0.5);
-                    // cplx_scale(cdata[index + stride], 0.5);
-                    cdata[index].real >>= 1;
-                    cdata[index].imag >>= 1;
-                    cdata[index + stride].real >>= 1;
-                    cdata[index + stride].imag >>= 1;
-
+                    fix_cplx_half(cdata[index]);
+                    fix_cplx_half(cdata[index + stride]);
                     if (tw_index == 1)
                     {
                         fix_cplx_conj(cdata[index], cdata[index]);
