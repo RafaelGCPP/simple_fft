@@ -30,3 +30,7 @@ typedef struct s_fix_complex
 #define fix_cplx_conj(r, x) ( \
     (r).real = (x).real,      \
     (r).imag = -(x).imag)
+
+#define fix_cplx_times_j(x) {  int temp = (x).real;  (x).real = -(x).imag; (x).imag = temp;  }
+#define fix_cplx_times_neg_j(x) {  int temp = (x).real;  (x).real = (x).imag; (x).imag = -temp;  }
+

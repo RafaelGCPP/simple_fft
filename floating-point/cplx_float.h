@@ -19,3 +19,4 @@ typedef struct s_complex_float
 #define cplx_conj(r, x) ((r).real = (x).real, (r).imag = -(x).imag)
 #define cplx_neg(x) ((x).real = -(x).real, (x).imag = -(x).imag)
 #define cplx_times_j(x) { float temp = (x).real; (x).real = -(x).imag; (x).imag = temp; }
+#define cplx_times_neg_j(x) { float temp = (x).real; (x).real = (x).imag; (x).imag = -temp; }

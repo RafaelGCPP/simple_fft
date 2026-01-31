@@ -59,10 +59,7 @@ void radix_2_dit_fft_fix(int *data, int l2n, int *twiddle, int *bitrev, int ts, 
                     if (ti == (n >> 2))
                     {
                         // multiply by -j
-                        fix_cplx r;
-                        r.imag = -b.real;
-                        r.real = b.imag;
-                        b = r;
+                        fix_cplx_times_neg_j(b);
                     }
                     else
                     {
