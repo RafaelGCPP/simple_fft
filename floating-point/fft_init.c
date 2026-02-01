@@ -1,7 +1,7 @@
 #include <math.h>
 #include <fft.h>
 
-void precompute_twiddle_factors(float *twiddle, int n)
+void precompute_twiddle_factors(float* const twiddle, int n)
 {
     for (int j = 0; j < n / 2; j++)
     {
@@ -10,12 +10,12 @@ void precompute_twiddle_factors(float *twiddle, int n)
     }
 }
 
-void precompute_twiddle_factors_rfft(float *twiddle, int n)
+void precompute_twiddle_factors_rfft(float* const twiddle, int n)
 {
     precompute_twiddle_factors(twiddle, n);
 }
 
-void precompute_bitrev_table(int *bitrev, int n)
+void precompute_bitrev_table(int* const bitrev, int n)
 {
     bitrev[0] = 0;
     for (int i = 1, j = 0; i < n; i++)
@@ -31,7 +31,7 @@ void precompute_bitrev_table(int *bitrev, int n)
     }
 }
 
-void precompute_bitrev_table_rfft(int *bitrev, int n)
+void precompute_bitrev_table_rfft(int* const bitrev, int n)
 {
     precompute_bitrev_table(bitrev, n / 2);
 }

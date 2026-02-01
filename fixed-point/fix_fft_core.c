@@ -11,13 +11,13 @@
 // ts - twiddle stride, used when computing the real FFT.
 // This version uses no internal complex data types, and
 // fixed point arithmetic. Numbers are represented as S8.23.
-void radix_2_dit_fft_fix(int *data, int l2n, int *twiddle, int *bitrev, int ts, int direction)
+void radix_2_dit_fft_fix(int* const data, int l2n, int* const twiddle, int* const bitrev, int ts, int direction)
 {
 
     int n = 1 << l2n;
 
-    fix_cplx *cdata = (fix_cplx *)data;
-    fix_cplx *twd = (fix_cplx *)twiddle;
+    fix_cplx *const cdata = (fix_cplx *)data;
+    fix_cplx *const twd = (fix_cplx *)twiddle;
 
     // Bit-reverse the input data
 
@@ -45,9 +45,13 @@ void radix_2_dit_fft_fix(int *data, int l2n, int *twiddle, int *bitrev, int ts, 
                 int index = j + i;
                 int ti = i * tw_index;
 
-                w=twd[ti * ts];
-                a=cdata[index];
-                b=cdata[index + stride];
+                w = twd[ti * ts];
+
+                fix_cplx* const restrict x = &cdata[index];
+                fix_cplx* const restrict y = &cdata[index + stride];
+
+                a = *x;
+                b = *y;
 
                 if (direction == -1 && stride == 1)
                 {
@@ -69,17 +73,17 @@ void radix_2_dit_fft_fix(int *data, int l2n, int *twiddle, int *bitrev, int ts, 
                     }
                 }
 
-                fix_cplx_add(cdata[index], a, b);
-                fix_cplx_sub(cdata[index + stride], a, b);
+                fix_cplx_add(*x, a, b);
+                fix_cplx_sub(*y, a, b);
 
                 if (direction == -1)
                 {
-                    fix_cplx_half(cdata[index]);
-                    fix_cplx_half(cdata[index + stride]);
+                    fix_cplx_half(*x);
+                    fix_cplx_half(*y);
                     if (tw_index == 1)
                     {
-                        fix_cplx_conj(cdata[index], cdata[index]);
-                        fix_cplx_conj(cdata[index + stride], cdata[index + stride]);
+                        fix_cplx_conj(*x, *x);
+                        fix_cplx_conj(*y, *y);
                     }
                 }
             }

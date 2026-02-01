@@ -16,7 +16,7 @@
 // Reference:
 // Numerical Recipes in C, chapter 12.3
 // this code uses no internal complex data types
-void rfft_core(float *data, int n, float *twiddle, int *bitrev, int direction)
+void rfft_core(float* const data, int n, float* const twiddle, int* const bitrev, int direction)
 {
 
     cplx *cdata = (cplx *)data;
@@ -120,12 +120,12 @@ void rfft_core(float *data, int n, float *twiddle, int *bitrev, int direction)
     }
 }
 
-void rfft(float *data, int n, float *twiddle, int *bitrev)
+void rfft(float* const data, int n, float* const twiddle, int* const bitrev)
 {
     rfft_core(data, n, twiddle, bitrev, 1);
 }
 
-void irfft(float *data, int n, float *twiddle, int *bitrev)
+void irfft(float* const data, int n, float* const twiddle, int* const bitrev)
 {
 
     rfft_core(data, n, twiddle, bitrev, -1);

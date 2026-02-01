@@ -16,7 +16,7 @@
 // Reference:
 // Numerical Recipes in C, chapter 12.3
 // this code uses no internal complex data types
-void rfft_core_fix(int *data, int l2n, int *twiddle, int *bitrev, int direction)
+void rfft_core_fix(int* const data, int l2n, int* const twiddle, int* const bitrev, int direction)
 {
     int n = 1 << l2n;
     fix_cplx *cdata = (fix_cplx *)data;

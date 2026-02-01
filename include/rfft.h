@@ -1,7 +1,7 @@
 #pragma once
 
-void rfft(float *data, int n, float *twiddle, int *bitrev);
-void irfft(float *data, int n, float *twiddle, int *bitrev);
+void rfft(float* const data, int n, float* const twiddle, int* const bitrev);
+void irfft(float* const data, int n, float* const twiddle, int* const bitrev);
 
-void precompute_twiddle_factors_rfft(float *twiddle, int n);
-void precompute_bitrev_table_rfft(int *bitrev, int n);
+void precompute_twiddle_factors_rfft(float* const twiddle, int n);
+void precompute_bitrev_table_rfft(int* const bitrev, int n);

@@ -10,7 +10,7 @@
 // twiddle - precomputed twiddle factors.
 // ts - twiddle stride, used when computing the real FFT.
 // This version uses no internal complex data types.
-void radix_2_dit_fft(float *data, int n, float *twiddle, int *bitrev, int ts, int direction)
+void radix_2_dit_fft(float *const data, int n, float *const twiddle, int *const bitrev, int ts, int direction)
 {
 
     cplx *cdata = (cplx *)data;
@@ -41,10 +41,13 @@ void radix_2_dit_fft(float *data, int n, float *twiddle, int *bitrev, int ts, in
                 cplx a, b, w;
                 int index = j + i;
 
-                w=twd[i * tw_index * ts];
+                w = twd[i * tw_index * ts];
 
-                a=cdata[index];
-                b=cdata[index + stride];
+                cplx *const restrict x = cdata + index;
+                cplx *const restrict y = cdata + index + stride;
+
+                a = *x;
+                b = *y;
 
                 if (direction == -1 && stride == 1)
                 {
@@ -55,17 +58,17 @@ void radix_2_dit_fft(float *data, int n, float *twiddle, int *bitrev, int ts, in
                 cplx_mul(r, b, w);
                 b = r;
 
-                cplx_add(cdata[index], a, b);
-                cplx_sub(cdata[index + stride], a, b);
+                cplx_add(*x, a, b);
+                cplx_sub(*y, a, b);
 
                 if (direction == -1)
                 {
-                    cplx_half(cdata[index]);
-                    cplx_half(cdata[index + stride]);
+                    cplx_half(*x);
+                    cplx_half(*y);
                     if (tw_index == 1)
                     {
-                        cplx_conj(cdata[index], cdata[index]);
-                        cplx_conj(cdata[index + stride], cdata[index + stride]);
+                        cplx_conj(*x, *x);
+                        cplx_conj(*y, *y);
                     }
                 }
             }
