@@ -55,12 +55,14 @@ void rfft_core(float* const data, int n, float* const twiddle, int* const bitrev
         // even1 = (cdata[n / 2 - i] + conj(cdata[i])) / 2; == conj(even1)
         // odd1 = (cdata[n / 2 - i] - conj(cdata[i])) / 2;  == -conj(odd1)
 
+        cplx* const restrict x = &cdata[i];
+        cplx* const restrict y = &cdata[n/2 - i];
 
         cplx tmp;
-        cplx_conj(tmp, cdata[n/2 - i]); // tmp = conj(cdata[i])
-        cplx_add(even, cdata[i], tmp);
+        cplx_conj(tmp, *y); // tmp = conj(cdata[i])
+        cplx_add(even, *x, tmp);
         cplx_half(even);
-        cplx_sub(odd, cdata[i], tmp);
+        cplx_sub(odd, *x, tmp);
         cplx_half(odd);
 
 
@@ -85,7 +87,7 @@ void rfft_core(float* const data, int n, float* const twiddle, int* const bitrev
             cplx_times_j(tmp); // tmp = I * odd * w
 
             // cdata[i] = even - I * odd * w;
-            cplx_sub(cdata[i], even, tmp);
+            cplx_sub(*x, even, tmp);
 
             // tmp= I * odd1 * w1 = I * conj (tmp1)
             tmp.real = -tmp.real;
@@ -93,7 +95,7 @@ void rfft_core(float* const data, int n, float* const twiddle, int* const bitrev
             // cdata[n / 2 - i] = even1 - I * odd1 * w1;
             // = conj(even) - i * conj (odd * w)
             cplx_conj(even, even);
-            cplx_sub(cdata[n / 2 - i], even, tmp);
+            cplx_sub(*y, even, tmp);
         }
         else
         {
@@ -104,13 +106,13 @@ void rfft_core(float* const data, int n, float* const twiddle, int* const bitrev
             cplx_mul(tmp, odd, w);
             cplx_times_j(tmp); // tmp = I * odd * w
             // cdata[i] = even + I * odd * w;
-            cplx_add(cdata[i], even, tmp);
+            cplx_add(*x, even, tmp);
            
             // cdata[n / 2 - i] = even1 + I * odd1 * w1;
             // = conj(even) + i * conj (odd * w)
             cplx_conj(even, even);
             tmp.real = -tmp.real;   
-            cplx_add(cdata[n / 2 - i], even, tmp);
+            cplx_add(*y, even, tmp);
 
         }
     }
