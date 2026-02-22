@@ -64,7 +64,7 @@ void rfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
         //                  = conj(even) + i * conj (odd * w)
 
         // we will build I * odd * w as tmp
-        tmp = fix_cplx_mul(odd, twd[i], 31);
+        tmp = fix_cplx_mul(odd, twd[i]);
         fix_cplx_times_j(&tmp); // tmp = I * odd * w
 
         // cdata[i] = even - I * odd * w;
@@ -130,7 +130,7 @@ void irfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
         // we will build I * odd * w as tmp
         fix_cplx w;
         w   = fix_cplx_conj(twd[i]);
-        tmp = fix_cplx_mul(odd, w, 31);
+        tmp = fix_cplx_mul(odd, w);
         fix_cplx_times_j(&tmp); // tmp = I * odd * w
         // cdata[i] = even + I * odd * w;
         cdata[i] = fix_cplx_add(even, tmp);

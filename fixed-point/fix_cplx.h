@@ -15,11 +15,13 @@ typedef struct s_fix_complex
 // Fixed-point multiply: (x * y) >> N, using 64-bit intermediate to avoid overflow.
 // The half-LSB bias (1 << (N-1)) is added before the shift to perform
 // round-to-nearest instead of truncation, avoiding accumulated negative bias.
-static inline int fix_mul(int x, int y, int N)
+// This function assumes that either x or y is Q31. The result will be in the 
+// same format as the non-Q31 input.
+static inline int fix_mul(int x, int y)
 {
     long long prod = (long long)x * (long long)y;
-    prod += (long long)1 << (N - 1);
-    return (int)(prod >> N);
+    prod += (long long)1 << 30;
+    return (int)(prod >> 31);
 }
 
 // Halve a complex number in place.
@@ -50,11 +52,11 @@ static inline fix_cplx fix_cplx_sub(fix_cplx x, fix_cplx y)
 }
 
 // Return x * y using fixed-point fractional bits N.
-static inline fix_cplx fix_cplx_mul(fix_cplx x, fix_cplx y, int N)
+static inline fix_cplx fix_cplx_mul(fix_cplx x, fix_cplx y)
 {
     return (fix_cplx){
-        fix_mul(x.real, y.real, N) - fix_mul(x.imag, y.imag, N),
-        fix_mul(x.real, y.imag, N) + fix_mul(x.imag, y.real, N)};
+        fix_mul(x.real, y.real) - fix_mul(x.imag, y.imag),
+        fix_mul(x.real, y.imag) + fix_mul(x.imag, y.real)};
 }
 
 // Return the complex conjugate of x.

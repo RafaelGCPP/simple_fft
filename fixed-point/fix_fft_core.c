@@ -58,7 +58,7 @@ static void radix_2_dif_fft_fix_fwd(int *const data, int l2n, int *const twiddle
                     }
                     else
                     {
-                        *y = fix_cplx_mul(*y, w, 31);
+                        *y = fix_cplx_mul(*y, w);
                     }
                 }
             }
@@ -118,7 +118,7 @@ static void radix_2_dit_fft_fix_rev(int *const data, int l2n, int *const twiddle
                     }
                     else
                     {
-                        b = fix_cplx_mul(b, w, 31);
+                        b = fix_cplx_mul(b, w);
                     }
                 }
 
