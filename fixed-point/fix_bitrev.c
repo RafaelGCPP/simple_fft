@@ -1,6 +1,6 @@
 #include "fix_bitrev.h"
 #include "fix_cplx.h"
-
+#include <stdint.h>
 #if defined(__ARM_FEATURE_DSP)
 #include <arm_acle.h>
 #endif
@@ -9,7 +9,7 @@
 // l2n  - log2(n).
 // bitrev_table - precomputed bit-reversal table, or NULL if ARM RBIT
 //                intrinsic is available (in which case no table is needed).
-void fix_bitrev(int *const data, int l2n, int *const bitrev_table)
+void fix_bitrev(int32_t *const data, int l2n, int *const bitrev_table)
 {
     int n = 1 << l2n;
     fix_cplx *const cdata = (fix_cplx *)data;
