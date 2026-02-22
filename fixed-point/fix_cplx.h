@@ -17,7 +17,7 @@ typedef struct s_fix_complex
 // round-to-nearest instead of truncation, avoiding accumulated negative bias.
 static inline int fix_mul(int x, int y, int N)
 {
-#if defined(__ARM_ACLE) && defined(__ARM_FEATURE_DSP)
+#if defined(__ARM_FEATURE_DSP)
     // __smull gives a true 64-bit result in a single instruction
     return (int)(__smull(x, y) >> N);
 #else
@@ -35,7 +35,7 @@ static inline void fix_cplx_half(fix_cplx *x)
 // Return x + y.
 static inline fix_cplx fix_cplx_add(fix_cplx x, fix_cplx y)
 {
-#if defined(__ARM_ACLE) && defined(__ARM_FEATURE_SAT)
+#if defined(__ARM_FEATURE_DSP)
     return (fix_cplx){ __qadd(x.real, y.real), __qadd(x.imag, y.imag) };
 #else
     return (fix_cplx){ x.real + y.real, x.imag + y.imag };
@@ -45,7 +45,11 @@ static inline fix_cplx fix_cplx_add(fix_cplx x, fix_cplx y)
 // Return x - y.
 static inline fix_cplx fix_cplx_sub(fix_cplx x, fix_cplx y)
 {
+#if defined(__ARM_FEATURE_DSP)
+    return (fix_cplx){ __qsub(x.real, y.real), __qsub(x.imag, y.imag) };
+#else
     return (fix_cplx){x.real - y.real, x.imag - y.imag};
+#endif
 }
 
 // Return x * y using fixed-point fractional bits N.
@@ -77,3 +81,13 @@ static inline void fix_cplx_times_neg_j(fix_cplx *x)
     x->real = x->imag;
     x->imag = -temp;
 }
+
+
+#ifdef __ARM_FEATURE_DSP
+static inline uint32_t rbit32(uint32_t x)
+{
+    uint32_t y;
+    __asm__ volatile ("rbit %0, %1" : "=r"(y) : "r"(x));
+    return y;
+}
+#endif

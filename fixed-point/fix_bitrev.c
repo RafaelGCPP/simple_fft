@@ -1,7 +1,7 @@
 #include "fix_bitrev.h"
 #include "fix_cplx.h"
 
-#if defined(__ARM_ACLE)
+#if defined(__ARM_FEATURE_DSP)
 #include <arm_acle.h>
 #endif
 
@@ -14,12 +14,12 @@ void fix_bitrev(int *const data, int l2n, int *const bitrev_table)
     int n = 1 << l2n;
     fix_cplx *const cdata = (fix_cplx *)data;
 
-#if defined(__ARM_ACLE) && defined(__ARM_FEATURE_BIT_REVERSAL)
+#if defined(__ARM_FEATURE_DSP)
     // Single-cycle RBIT instruction available: table is not needed.
     (void)bitrev_table; // suppress unused-parameter warning
     for (int i = 1; i < n - 1; i++)
     {
-        int j = (int)(__rbit((uint32_t)i) >> (32 - l2n));
+        int j = (int)(rbit32((uint32_t)i) >> (32 - l2n));
         if (i < j)
         {
             fix_cplx tmp = cdata[i];
