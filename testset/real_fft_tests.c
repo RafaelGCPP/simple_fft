@@ -41,7 +41,7 @@ void real_fft_test()
     }
 }
 
-void print_fix_rfft(int *data, int n)
+void print_fix_rfft(int32_t *data, int n)
 {
     printf("%10.5f%+10.5fi\n",
            (float)data[0] / 0x800000, 0.0);
