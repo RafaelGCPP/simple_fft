@@ -9,7 +9,7 @@
 // l2n  - log2(n), used to shift the RBIT result on ARM.
 // bitrev_table - precomputed bit-reversal table, or NULL if ARM RBIT
 //                intrinsic is available (in which case no table is needed).
-void bitrev(float *const data, int n, int l2n, int *const bitrev_table)
+void bitrev(float *const data, int n, int *const bitrev_table)
 {
     cplx *const cdata = (cplx *)data;
 
@@ -18,7 +18,7 @@ void bitrev(float *const data, int n, int l2n, int *const bitrev_table)
     (void)bitrev_table; // suppress unused-parameter warning
     for (int i = 1; i < n - 1; i++)
     {
-        int j = (int)(__rbit((uint32_t)i) >> (32 - l2n));
+        int j = (int)(__rbit((uint32_t)i) >> (32 - __builtin_ctz(n)));
         if (i < j)
         {
             cplx tmp = cdata[i];
@@ -28,7 +28,6 @@ void bitrev(float *const data, int n, int l2n, int *const bitrev_table)
     }
 #else
     // Fallback: precomputed table lookup. Table must not be NULL.
-    (void)l2n;
     for (int i = 1; i < n - 1; i++)
     {
         int j = bitrev_table[i];
