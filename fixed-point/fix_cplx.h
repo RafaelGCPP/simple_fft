@@ -1,5 +1,5 @@
 #pragma once
-#if defined(__ARM_ACLE)
+#if defined(__ARM_FEATURE_DSP)
 #include <arm_acle.h>
 #endif
 
