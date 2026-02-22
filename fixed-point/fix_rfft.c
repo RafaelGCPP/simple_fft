@@ -2,6 +2,7 @@
 #include <math.h>
 #include "fix_fft_core.h"
 #include "fix_cplx.h"
+#include <stdint.h>
 
 // This code assumes that n is a power of 2 and implements
 // the real FFT algorithm. It is based on the fact that
@@ -18,7 +19,7 @@
 // this code uses no internal complex data types
 
 
-void rfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
+void rfft_fix(int32_t *data, int l2n, int32_t *twiddle, int *bitrev)
 {
     int n = 1 << l2n;
     fix_cplx *cdata = (fix_cplx *)data;
@@ -64,7 +65,7 @@ void rfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
         //                  = conj(even) + i * conj (odd * w)
 
         // we will build I * odd * w as tmp
-        tmp = fix_cplx_mul(odd, twd[i]);
+        tmp = fix_cplx_mul_s823_q31(odd, twd[i]);
         fix_cplx_times_j(&tmp); // tmp = I * odd * w
 
         // cdata[i] = even - I * odd * w;
@@ -80,7 +81,7 @@ void rfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
     }
 }
 
-void irfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
+void irfft_fix(int32_t *data, int l2n, int32_t *twiddle, int *bitrev)
 {
 
     // rfft_core_fix(data, l2n, twiddle, bitrev, -1);
@@ -130,7 +131,7 @@ void irfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
         // we will build I * odd * w as tmp
         fix_cplx w;
         w   = fix_cplx_conj(twd[i]);
-        tmp = fix_cplx_mul(odd, w);
+        tmp = fix_cplx_mul_s823_q31(odd, w);
         fix_cplx_times_j(&tmp); // tmp = I * odd * w
         // cdata[i] = even + I * odd * w;
         cdata[i] = fix_cplx_add(even, tmp);

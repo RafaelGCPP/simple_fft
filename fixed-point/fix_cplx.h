@@ -2,14 +2,15 @@
 #if defined(__ARM_FEATURE_DSP)
 #include <arm_acle.h>
 #endif
+#include <stdint.h>
 
 // This is a fixed-point implementation of complex numbers.
 // Fixed point numbers will be S8.23, i.e. 8 bits for the integer part and 23 bits for the fractional part.
 
 typedef struct s_fix_complex
 {
-    int real;
-    int imag;
+    int32_t real;
+    int32_t imag;
 } fix_cplx;
 
 // Fixed-point multiply: (x * y) >> N, using 64-bit intermediate to avoid overflow.
@@ -17,11 +18,11 @@ typedef struct s_fix_complex
 // round-to-nearest instead of truncation, avoiding accumulated negative bias.
 // This function assumes that either x or y is Q31. The result will be in the 
 // same format as the non-Q31 input.
-static inline int fix_mul(int x, int y)
+static inline int32_t fix_mul_s823_q31(int32_t x, int32_t y)
 {
-    long long prod = (long long)x * (long long)y;
-    prod += (long long)1 << 30;
-    return (int)(prod >> 31);
+    int64_t prod = (int64_t)x * (int64_t)y;
+    prod += (int64_t)1 << 30;
+    return (int32_t)(prod >> 31);
 }
 
 // Halve a complex number in place.
@@ -52,11 +53,11 @@ static inline fix_cplx fix_cplx_sub(fix_cplx x, fix_cplx y)
 }
 
 // Return x * y using fixed-point fractional bits N.
-static inline fix_cplx fix_cplx_mul(fix_cplx x, fix_cplx y)
+static inline fix_cplx fix_cplx_mul_s823_q31(fix_cplx x, fix_cplx y)
 {
     return (fix_cplx){
-        fix_mul(x.real, y.real) - fix_mul(x.imag, y.imag),
-        fix_mul(x.real, y.imag) + fix_mul(x.imag, y.real)};
+        fix_mul_s823_q31(x.real, y.real) - fix_mul_s823_q31(x.imag, y.imag),
+        fix_mul_s823_q31(x.real, y.imag) + fix_mul_s823_q31(x.imag, y.real)};
 }
 
 // Return the complex conjugate of x.
@@ -68,7 +69,7 @@ static inline fix_cplx fix_cplx_conj(fix_cplx x)
 // Multiply x by j (i.e. rotate 90°) in place: x = j * x => (-imag, real).
 static inline void fix_cplx_times_j(fix_cplx *x)
 {
-    int temp = x->real;
+    int32_t temp = x->real;
     x->real = -x->imag;
     x->imag = temp;
 }
@@ -76,13 +77,12 @@ static inline void fix_cplx_times_j(fix_cplx *x)
 // Multiply x by -j (i.e. rotate -90°) in place: x = -j * x => (imag, -real).
 static inline void fix_cplx_times_neg_j(fix_cplx *x)
 {
-    int temp = x->real;
+    int32_t temp = x->real;
     x->real = x->imag;
     x->imag = -temp;
 }
 
-
-#ifdef __ARM_FEATURE_DSP
+#if defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 static inline uint32_t rbit32(uint32_t x)
 {
     uint32_t y;

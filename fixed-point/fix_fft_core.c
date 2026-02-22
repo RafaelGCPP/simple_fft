@@ -1,6 +1,7 @@
 #include "fix_fft_core.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdint.h>
 #include "fix_cplx.h"
 #include "fix_bitrev.h"
 
@@ -14,7 +15,7 @@
 // fixed point arithmetic. Numbers are represented as S8.23.
 // The output is in bit reversed order, and the input is in normal order.
 
-static void radix_2_dif_fft_fix_fwd(int *const data, int l2n, int *const twiddle, int ts)
+static void radix_2_dif_fft_fix_fwd(int32_t *const data, int l2n, int32_t *const twiddle, int ts)
 {
 
     int n = 1 << l2n;
@@ -58,7 +59,7 @@ static void radix_2_dif_fft_fix_fwd(int *const data, int l2n, int *const twiddle
                     }
                     else
                     {
-                        *y = fix_cplx_mul(*y, w);
+                        *y = fix_cplx_mul_s823_q31(*y, w);
                     }
                 }
             }
@@ -75,7 +76,7 @@ static void radix_2_dif_fft_fix_fwd(int *const data, int l2n, int *const twiddle
 // This version uses no internal complex data types, and
 // fixed point arithmetic. Numbers are represented as S8.23.
 // The input is in bit reversed order, and the output is in normal order.
-static void radix_2_dit_fft_fix_rev(int *const data, int l2n, int *const twiddle, int ts)
+static void radix_2_dit_fft_fix_rev(int32_t *const data, int l2n, int32_t *const twiddle, int ts)
 {
 
     int n = 1 << l2n;
@@ -118,7 +119,7 @@ static void radix_2_dit_fft_fix_rev(int *const data, int l2n, int *const twiddle
                     }
                     else
                     {
-                        b = fix_cplx_mul(b, w);
+                        b = fix_cplx_mul_s823_q31(b, w);
                     }
                 }
 
@@ -137,7 +138,7 @@ static void radix_2_dit_fft_fix_rev(int *const data, int l2n, int *const twiddle
     }
 }
 
-void radix_2_fft_fix(int *const data, int l2n, int *const twiddle, int *const bitrev, int ts, int direction)
+void radix_2_fft_fix(int32_t *const data, int l2n, int32_t *const twiddle, int *const bitrev, int ts, int direction)
 {
     (void)bitrev;
     if (direction == 1)
