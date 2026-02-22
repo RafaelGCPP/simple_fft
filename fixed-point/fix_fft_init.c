@@ -30,7 +30,7 @@ void precompute_twiddle_factors_fix(int32_t * const twiddle, int l2n)
         // reduce the angle to [0,pi/2) and change signs accordingly
         // also we can use the first octant symmetry to evaluate 4 values at a time
 
-        int c, s;
+        int32_t c, s;
         cordic_sin_cos(theta, &s, &c);
         twiddle[2 * j] = c;
         twiddle[2 * j + 1] = -s;
