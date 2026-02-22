@@ -1,11 +1,12 @@
 #include "cordic.h"
 #include <math.h>
+#include <stdint.h>
 
 #define ITERATIONS 31
 #define K 0x4dba76d4 // 0.6072529350088812561694
 
 // atan(2^-i) / (pi/2) * 2^31
-const int atan_table[] = {
+const int32_t atan_table[] = {
     0x40000000, 0x25c80a3b, 0x13f670b6, 0x0a2223a8,
     0x05161a86, 0x028bafc2, 0x0145ec3c, 0x00a2f8aa,
     0x00517ca6, 0x0028be5d, 0x00145f30, 0x000a2f98,
@@ -19,7 +20,7 @@ const int atan_table[] = {
 // to use this function one must reduce the angle to the first or fourth quadrants
 // and then scale it to the range [-1,1]
 // 31 bits fractional representation means that 1 is represented as 0x7fffffff and -1 as 0x80000000
-void cordic_sin_cos(int theta, int *sin, int *cos)
+void cordic_sin_cos(int32_t theta, int32_t *sin, int32_t *cos)
 {
 
     switch (theta)
@@ -38,13 +39,13 @@ void cordic_sin_cos(int theta, int *sin, int *cos)
         return;
     }
 
-    int x = K;
-    int y = 0;
-    int z = theta;
+    int32_t x = K;
+    int32_t y = 0;
+    int32_t z = theta;
 
     for (int i = 0; i < ITERATIONS; i++)
     {
-        int tx, ty;
+        int32_t tx, ty;
 
         if (z >= 0)
         {

@@ -25,12 +25,12 @@ static void rfft_core_forward(float *const data, int n, float *const twiddle, in
     cplx even;
     cplx odd;
 
-    radix_2_dit_fft(data, n / 2, twiddle, bitrev, 2, 1); // the twiddle stride is 2 so we can reuse them when computing the real FFT
+    radix_2_fft(data, n / 2, twiddle, bitrev, 2, 1); // the twiddle stride is 2 so we can reuse them when computing the real FFT
 
     cplx tmp = cdata[0];
     cdata[0].real = tmp.real + tmp.imag;
     cdata[0].imag = tmp.real - tmp.imag;
-    cplx_conj(cdata[n / 4], cdata[n / 4]);
+    cdata[n / 4] = cplx_conj(cdata[n / 4]);
 
     for (int i = 1; i < n / 4; i++)
     {
@@ -43,12 +43,11 @@ static void rfft_core_forward(float *const data, int n, float *const twiddle, in
         cplx *const restrict x = &cdata[i];
         cplx *const restrict y = &cdata[n / 2 - i];
 
-        cplx tmp;
-        cplx_conj(tmp, *y); // tmp = conj(cdata[i])
-        cplx_add(even, *x, tmp);
-        cplx_half(even);
-        cplx_sub(odd, *x, tmp);
-        cplx_half(odd);
+        cplx tmp = cplx_conj(*y); // tmp = conj(cdata[i])
+        even = cplx_add(*x, tmp);
+        cplx_half(&even);
+        odd = cplx_sub(*x, tmp);
+        cplx_half(&odd);
 
         // In forward transform
         // w  =  twd[i]
@@ -63,19 +62,19 @@ static void rfft_core_forward(float *const data, int n, float *const twiddle, in
         //                  = conj(even) + i * conj (odd * w)
 
         // we will build I * odd * w as tmp
-        cplx_mul(tmp, odd, twd[i]);
-        cplx_times_j(tmp); // tmp = I * odd * w
+        tmp = cplx_mul(odd, twd[i]);
+        cplx_times_j(&tmp); // tmp = I * odd * w
 
         // cdata[i] = even - I * odd * w;
-        cplx_sub(*x, even, tmp);
+        *x = cplx_sub(even, tmp);
 
         // tmp= I * odd1 * w1 = I * conj (tmp1)
         tmp.real = -tmp.real;
 
         // cdata[n / 2 - i] = even1 - I * odd1 * w1;
         // = conj(even) - i * conj (odd * w)
-        cplx_conj(even, even);
-        cplx_sub(*y, even, tmp);
+        even = cplx_conj(even);
+        *y = cplx_sub(even, tmp);
     }
 }
 
@@ -89,11 +88,12 @@ static void rfft_core_inverse(float *const data, int n, float *const twiddle, in
     cplx odd;
 
     cplx tmp;
-    tmp.real = (cdata[0].real + cdata[0].imag) / 2;
-    tmp.imag = (cdata[0].real - cdata[0].imag) / 2;
+    tmp.real = (cdata[0].real + cdata[0].imag);
+    tmp.imag = (cdata[0].real - cdata[0].imag);
+    cplx_half(&tmp);
     cdata[0] = tmp;
 
-    cplx_conj(cdata[n / 4], cdata[n / 4]);
+    cdata[n / 4] = cplx_conj(cdata[n / 4]);
 
     for (int i = 1; i < n / 4; i++)
     {
@@ -106,12 +106,11 @@ static void rfft_core_inverse(float *const data, int n, float *const twiddle, in
         cplx *const restrict x = &cdata[i];
         cplx *const restrict y = &cdata[n / 2 - i];
 
-        cplx tmp;
-        cplx_conj(tmp, *y); // tmp = conj(cdata[i])
-        cplx_add(even, *x, tmp);
-        cplx_half(even);
-        cplx_sub(odd, *x, tmp);
-        cplx_half(odd);
+        cplx tmp = cplx_conj(*y); // tmp = conj(cdata[i])
+        even = cplx_add(*x, tmp);
+        cplx_half(&even);
+        odd = cplx_sub(*x, tmp);
+        cplx_half(&odd);
 
         // In forward transform
         // w  =  twd[i]
@@ -126,21 +125,18 @@ static void rfft_core_inverse(float *const data, int n, float *const twiddle, in
         //                  = conj(even) + i * conj (odd * w)
 
         // we will build I * odd * w as tmp
-        cplx w;
-        cplx_conj(w, twd[i]);
-        cplx_mul(tmp, odd, w);
-        cplx_times_j(tmp); // tmp = I * odd * w
+        tmp = cplx_mul(odd, cplx_conj(twd[i]));
+        cplx_times_j(&tmp); // tmp = I * odd * w
         // cdata[i] = even + I * odd * w;
-        cplx_add(*x, even, tmp);
+        *x = cplx_add(even, tmp);
 
         // cdata[n / 2 - i] = even1 + I * odd1 * w1;
         // = conj(even) + i * conj (odd * w)
-        cplx_conj(even, even);
+        even = cplx_conj(even);
         tmp.real = -tmp.real;
-        cplx_add(*y, even, tmp);
+        *y = cplx_add(even, tmp);
     }
-    radix_2_dit_fft(data, n / 2, twiddle, bitrev, 2, -1);
-    
+    radix_2_fft(data, n / 2, twiddle, bitrev, 2, -1);
 }
 
 void rfft(float *const data, int n, float *const twiddle, int *const bitrev)

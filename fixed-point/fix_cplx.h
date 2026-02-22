@@ -1,36 +1,81 @@
 #pragma once
+#include <stdint.h>
 
 // This is a fixed-point implementation of complex numbers.
 // Fixed point numbers will be S8.23, i.e. 8 bits for the integer part and 23 bits for the fractional part.
 
 typedef struct s_fix_complex
 {
-    int real;
-    int imag;
+    int32_t real;
+    int32_t imag;
 } fix_cplx;
 
-#define fix_mul(x, y, N) ((int)((long long)x) * ((long long)y) >> (N))
+// Fixed-point multiply: (x * y) >> N, using 64-bit intermediate to avoid overflow.
+// The half-LSB bias (1 << (N-1)) is added before the shift to perform
+// round-to-nearest instead of truncation, avoiding accumulated negative bias.
+// This function assumes that either x or y is Q31. The result will be in the 
+// same format as the non-Q31 input.
+static inline int32_t fix_mul_s823_q31(int32_t x, int32_t y)
+{
+    int64_t prod = (int64_t)x * (int64_t)y;
+    prod += (int64_t)1 << 30;
+    return (int32_t)(prod >> 31);
+}
 
-#define fix_cplx_half(x) (    \
-    (x).real >>= 1, \
-    (x).imag >>= 1)
+// Halve a complex number in place.
+static inline void fix_cplx_half(fix_cplx *x)
+{
+    x->real >>= 1;
+    x->imag >>= 1;
+}
 
-#define fix_cplx_add(r, x, y) (     \
-    (r).real = (x).real + (y).real, \
-    (r).imag = (x).imag + (y).imag)
+// Return x + y.
+static inline fix_cplx fix_cplx_add(fix_cplx x, fix_cplx y)
+{
+    return (fix_cplx){ x.real + y.real, x.imag + y.imag };
+}
 
-#define fix_cplx_sub(r, x, y) (     \
-    (r).real = (x).real - (y).real, \
-    (r).imag = (x).imag - (y).imag)
+// Return x - y.
+static inline fix_cplx fix_cplx_sub(fix_cplx x, fix_cplx y)
+{
+    return (fix_cplx){x.real - y.real, x.imag - y.imag};
+}
 
-#define fix_cplx_mul(r, x, y, N) (                                                  \
-    (r).real = fix_mul((x).real, (y).real, (N)) - fix_mul((x).imag, (y).imag, (N)), \
-    (r).imag = fix_mul((x).real, (y).imag, (N)) + fix_mul((x).imag, (y).real, (N)))
+// Return x * y using fixed-point fractional bits N.
+static inline fix_cplx fix_cplx_mul_s823_q31(fix_cplx x, fix_cplx y)
+{
+    return (fix_cplx){
+        fix_mul_s823_q31(x.real, y.real) - fix_mul_s823_q31(x.imag, y.imag),
+        fix_mul_s823_q31(x.real, y.imag) + fix_mul_s823_q31(x.imag, y.real)};
+}
 
-#define fix_cplx_conj(r, x) ( \
-    (r).real = (x).real,      \
-    (r).imag = -(x).imag)
+// Return the complex conjugate of x.
+static inline fix_cplx fix_cplx_conj(fix_cplx x)
+{
+    return (fix_cplx){x.real, -x.imag};
+}
 
-#define fix_cplx_times_j(x) {  int temp = (x).real;  (x).real = -(x).imag; (x).imag = temp;  }
-#define fix_cplx_times_neg_j(x) {  int temp = (x).real;  (x).real = (x).imag; (x).imag = -temp;  }
+// Multiply x by j (i.e. rotate 90°) in place: x = j * x => (-imag, real).
+static inline void fix_cplx_times_j(fix_cplx *x)
+{
+    int32_t temp = x->real;
+    x->real = -x->imag;
+    x->imag = temp;
+}
 
+// Multiply x by -j (i.e. rotate -90°) in place: x = -j * x => (imag, -real).
+static inline void fix_cplx_times_neg_j(fix_cplx *x)
+{
+    int32_t temp = x->real;
+    x->real = x->imag;
+    x->imag = -temp;
+}
+
+#if defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+static inline uint32_t rbit32(uint32_t x)
+{
+    uint32_t y;
+    __asm__ volatile ("rbit %0, %1" : "=r"(y) : "r"(x));
+    return y;
+}
+#endif

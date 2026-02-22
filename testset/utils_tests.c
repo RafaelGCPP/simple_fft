@@ -1,9 +1,10 @@
 #include "test_set.h"
+#include <stdint.h>
 
 void cordic_test()
 {
     int n = 16;
-    int t, s, c;
+    int32_t t, s, c;
     printf("-=-=-=-=-=-= Cordic test =-=-=-=-=-=-\n");
     for (int i = -n; i <= n; i++)
     {
@@ -32,7 +33,7 @@ void twiddle_test()
 void fix_twiddle_test()
 {
     int n = 128, l2n = 7;
-    int twiddle[n];
+    int32_t twiddle[n];
     float twiddle_f[n];
     printf("-=-=-=-=-=-= Fix twiddle test =-=-=-=-=-=-\n");
     precompute_twiddle_factors_fix(twiddle, l2n);

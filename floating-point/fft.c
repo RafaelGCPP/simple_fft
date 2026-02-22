@@ -7,10 +7,10 @@
 
 void fft(float* const data, int n, float* const twiddle, int* const bitrev)
 {
-    radix_2_dit_fft(data, n, twiddle, bitrev, 1, 1);
+    radix_2_fft(data, n, twiddle, bitrev, 1, 1);
 }
 
 void ifft(float* const data, int n, float* const twiddle, int* const bitrev)
 {
-    radix_2_dit_fft(data, n, twiddle, bitrev, 1, -1);
+    radix_2_fft(data, n, twiddle, bitrev, 1, -1);
 }

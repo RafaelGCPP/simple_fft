@@ -1,0 +1,7 @@
+The default language in all documentation, comments and messages should be English. This includes variable names, function names, and any other identifiers in the code. This ensures that the code is accessible and understandable to a wider audience, including developers who may not speak the same native language as the original author. Additionally, using English as the default language promotes consistency and helps maintain a professional standard in the codebase.
+
+This code is expected to use C11 standard. 
+
+Avoid removing code for debugging. If needed, comment out the code instead of deleting it. This allows for easier debugging and troubleshooting in the future, as the original code can be easily restored if necessary. It also helps to maintain a clear history of changes and allows other developers to understand the reasoning behind certain decisions or modifications in the code.
+
+This library should not use OS specific resources, as it is intended to be cross-platform and usable in microcontrollers as well. This means that the code should not rely on any operating system-specific features or APIs, and should instead use standard C libraries and functions that are available across different platforms. By avoiding OS-specific resources, the library can be more easily ported and used in a wider range of environments, including embedded systems and microcontrollers where resources may be limited.

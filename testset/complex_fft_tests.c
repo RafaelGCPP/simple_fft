@@ -1,4 +1,5 @@
 #include "test_set.h"
+#include <stdint.h>
 
 void complex_fft_test()
 {
@@ -36,9 +37,9 @@ void complex_fft_test()
 
 void complex_fft_test_fix()
 {
-    int n = 8, l2n = 3;                                                    // Change this value for different sizes of the arrays (N)
-    int data[] = {1, 2, 3, 4, 5, 6, 7, 8, -8, -7, -6, -5, -4, -3, -2, -1}; // interleaved real and imaginary parts
-    int twiddle[n];
+    const int n = 8, l2n = 3;                                                    // Change this value for different sizes of the arrays (N)
+    int32_t data[] = {1, 2, 3, 4, 5, 6, 7, 8, -8, -7, -6, -5, -4, -3, -2, -1}; // interleaved real and imaginary parts
+    int32_t twiddle[n];
     int bitrev[n];
 
     for (int i = 0; i < 2 * n; i++)

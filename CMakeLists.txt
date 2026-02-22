@@ -4,7 +4,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 project(simple_fft)
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 
 # Add include directory to the include path
 include_directories(include)

@@ -1,12 +1,13 @@
 #include <cordic.h>
 #include <fix_fft.h>
 #include <string.h>
+#include <stdint.h>
 
-void precompute_twiddle_factors_fix(int* const twiddle, int l2n)
+void precompute_twiddle_factors_fix(int32_t * const twiddle, int l2n)
 {
 
     int n = 1 << l2n;
-    memset(twiddle, 0, n * sizeof(int));
+    memset(twiddle, 0, n * sizeof(int32_t));
     // defining twiddle factor for 0 rad, although it will not be needed
     twiddle[0] = 0x7fffffff; // cos(0)==1 in Q31
     twiddle[1] = 0x00000000; // sin(0)==0 in Q31
@@ -29,7 +30,7 @@ void precompute_twiddle_factors_fix(int* const twiddle, int l2n)
         // reduce the angle to [0,pi/2) and change signs accordingly
         // also we can use the first octant symmetry to evaluate 4 values at a time
 
-        int c, s;
+        int32_t c, s;
         cordic_sin_cos(theta, &s, &c);
         twiddle[2 * j] = c;
         twiddle[2 * j + 1] = -s;
@@ -46,7 +47,7 @@ void precompute_twiddle_factors_fix(int* const twiddle, int l2n)
     }
 }
 
-void precompute_twiddle_factors_rfft_fix(int* const twiddle, int l2n)
+void precompute_twiddle_factors_rfft_fix(int32_t* const twiddle, int l2n)
 {
     precompute_twiddle_factors_fix(twiddle, l2n);
 }

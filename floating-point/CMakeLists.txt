@@ -10,6 +10,7 @@ set(CMAKE_C_STANDARD 99)
 
 # Add your source files here
 set(SOURCES    
+    bitrev.c
     fft.c
     fft_core.c
     fft_init.c
