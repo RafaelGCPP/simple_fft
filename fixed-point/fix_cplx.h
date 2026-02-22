@@ -17,12 +17,9 @@ typedef struct s_fix_complex
 // round-to-nearest instead of truncation, avoiding accumulated negative bias.
 static inline int fix_mul(int x, int y, int N)
 {
-#if defined(__ARM_FEATURE_DSP)
-    // __smull gives a true 64-bit result in a single instruction
-    return (int)(__smull(x, y) >> N);
-#else
-    return (int)(((long long)x * (long long)y + (1LL << (N - 1))) >> N);
-#endif
+    long long prod = (long long)x * (long long)y;
+    prod += (long long)1 << (N - 1);
+    return (int)(prod >> N);
 }
 
 // Halve a complex number in place.
