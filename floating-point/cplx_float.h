@@ -11,12 +11,58 @@ typedef struct s_complex_float
     float imag;
 } cplx;
 
-#define cplx_scale(x, s) ((x).real *= (s), (x).imag *= (s))
-#define cplx_half(x) ((x).real /= 2, (x).imag /= 2)
-#define cplx_add(r, x, y) ((r).real = (x).real + (y).real, (r).imag = (x).imag + (y).imag)
-#define cplx_sub(r, x, y) ((r).real = (x).real - (y).real, (r).imag = (x).imag - (y).imag)
-#define cplx_mul(r, x, y) ((r).real = (x).real * (y).real - (x).imag * (y).imag, (r).imag = (x).real * (y).imag + (x).imag * (y).real)
-#define cplx_conj(r, x) ((r).real = (x).real, (r).imag = -(x).imag)
-#define cplx_neg(x) ((x).real = -(x).real, (x).imag = -(x).imag)
-#define cplx_times_j(x) { float temp = (x).real; (x).real = -(x).imag; (x).imag = temp; }
-#define cplx_times_neg_j(x) { float temp = (x).real; (x).real = (x).imag; (x).imag = -temp; }
+// Scale x by scalar s in place.
+static inline void cplx_scale(cplx *x, float s)
+{
+    x->real *= s;
+    x->imag *= s;
+}
+
+// Halve x in place.
+static inline void cplx_half(cplx *x)
+{
+    cplx_scale(x, 0.5f);
+}
+
+// Return x + y.
+static inline cplx cplx_add(cplx x, cplx y)
+{
+    return (cplx){ x.real + y.real, x.imag + y.imag };
+}
+
+// Return x - y.
+static inline cplx cplx_sub(cplx x, cplx y)
+{
+    return (cplx){ x.real - y.real, x.imag - y.imag };
+}
+
+// Return x * y.
+static inline cplx cplx_mul(cplx x, cplx y)
+{
+    return (cplx){
+        x.real * y.real - x.imag * y.imag,
+        x.real * y.imag + x.imag * y.real
+    };
+}
+
+// Return the complex conjugate of x.
+static inline cplx cplx_conj(cplx x)
+{
+    return (cplx){ x.real, -x.imag };
+}
+
+// Multiply x by j (rotate 90°) in place: x = j * x => (-imag, real).
+static inline void cplx_times_j(cplx *x)
+{
+    float temp = x->real;
+    x->real    = -x->imag;
+    x->imag    = temp;
+}
+
+// Multiply x by -j (rotate -90°) in place: x = -j * x => (imag, -real).
+static inline void cplx_times_neg_j(cplx *x)
+{
+    float temp = x->real;
+    x->real    = x->imag;
+    x->imag    = -temp;
+}

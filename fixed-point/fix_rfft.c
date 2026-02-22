@@ -27,13 +27,13 @@ void rfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
     fix_cplx even;
     fix_cplx odd;
 
-    radix_2_dit_fft_fix(data, l2n - 1, twiddle, bitrev, 2, 1); // the twiddle stride is 2 so we can reuse them when computing the real FFT
+    radix_2_fft_fix(data, l2n - 1, twiddle, bitrev, 2, 1); // the twiddle stride is 2 so we can reuse them when computing the real FFT
 
     fix_cplx tmp = cdata[0];
     cdata[0].real = tmp.real + tmp.imag;
     cdata[0].imag = tmp.real - tmp.imag;
 
-    fix_cplx_conj(cdata[n / 4], cdata[n / 4]);
+    cdata[n / 4] = fix_cplx_conj(cdata[n / 4]);
 
     for (int i = 1; i < n / 4; i++)
     {
@@ -45,11 +45,11 @@ void rfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
         // odd1 = (cdata[n / 2 - i] - conj(cdata[i])) / 2;  == -conj(odd1)
 
         fix_cplx tmp;
-        fix_cplx_conj(tmp, cdata[n / 2 - i]); // tmp = conj(cdata[i])
-        fix_cplx_add(even, cdata[i], tmp);
-        fix_cplx_half(even);
-        fix_cplx_sub(odd, cdata[i], tmp);
-        fix_cplx_half(odd);
+        tmp  = fix_cplx_conj(cdata[n / 2 - i]); // tmp = conj(cdata[i])
+        even = fix_cplx_add(cdata[i], tmp);
+        fix_cplx_half(&even);
+        odd  = fix_cplx_sub(cdata[i], tmp);
+        fix_cplx_half(&odd);
 
         // In forward transform
         // w  =  twd[i]
@@ -64,19 +64,19 @@ void rfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
         //                  = conj(even) + i * conj (odd * w)
 
         // we will build I * odd * w as tmp
-        fix_cplx_mul(tmp, odd, twd[i], 31);
-        fix_cplx_times_j(tmp); // tmp = I * odd * w
+        tmp = fix_cplx_mul(odd, twd[i], 31);
+        fix_cplx_times_j(&tmp); // tmp = I * odd * w
 
         // cdata[i] = even - I * odd * w;
-        fix_cplx_sub(cdata[i], even, tmp);
+        cdata[i] = fix_cplx_sub(even, tmp);
 
         // tmp= I * odd1 * w1 = I * conj (tmp1)
         tmp.real = -tmp.real;
 
         // cdata[n / 2 - i] = even1 - I * odd1 * w1;
         // = conj(even) - i * conj (odd * w)
-        fix_cplx_conj(even, even);
-        fix_cplx_sub(cdata[n / 2 - i], even, tmp);
+        even = fix_cplx_conj(even);
+        cdata[n / 2 - i] = fix_cplx_sub(even, tmp);
     }
 }
 
@@ -97,7 +97,7 @@ void irfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
 
     cdata[0] = tmp;
 
-    fix_cplx_conj(cdata[n / 4], cdata[n / 4]);
+    cdata[n / 4] = fix_cplx_conj(cdata[n / 4]);
 
     for (int i = 1; i < n / 4; i++)
     {
@@ -109,11 +109,11 @@ void irfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
         // odd1 = (cdata[n / 2 - i] - conj(cdata[i])) / 2;  == -conj(odd1)
 
         fix_cplx tmp;
-        fix_cplx_conj(tmp, cdata[n / 2 - i]); // tmp = conj(cdata[i])
-        fix_cplx_add(even, cdata[i], tmp);
-        fix_cplx_half(even);
-        fix_cplx_sub(odd, cdata[i], tmp);
-        fix_cplx_half(odd);
+        tmp  = fix_cplx_conj(cdata[n / 2 - i]); // tmp = conj(cdata[i])
+        even = fix_cplx_add(cdata[i], tmp);
+        fix_cplx_half(&even);
+        odd  = fix_cplx_sub(cdata[i], tmp);
+        fix_cplx_half(&odd);
 
         // In forward transform
         // w  =  twd[i]
@@ -129,17 +129,17 @@ void irfft_fix(int *data, int l2n, int *twiddle, int *bitrev)
 
         // we will build I * odd * w as tmp
         fix_cplx w;
-        fix_cplx_conj(w, twd[i]);
-        fix_cplx_mul(tmp, odd, w, 31);
-        fix_cplx_times_j(tmp); // tmp = I * odd * w
+        w   = fix_cplx_conj(twd[i]);
+        tmp = fix_cplx_mul(odd, w, 31);
+        fix_cplx_times_j(&tmp); // tmp = I * odd * w
         // cdata[i] = even + I * odd * w;
-        fix_cplx_add(cdata[i], even, tmp);
+        cdata[i] = fix_cplx_add(even, tmp);
 
         // cdata[n / 2 - i] = even1 + I * odd1 * w1;
         // = conj(even) + i * conj (odd * w)
-        fix_cplx_conj(even, even);
+        even = fix_cplx_conj(even);
         tmp.real = -tmp.real;
-        fix_cplx_add(cdata[n / 2 - i], even, tmp);
+        cdata[n / 2 - i] = fix_cplx_add(even, tmp);
     }
-    radix_2_dit_fft_fix(data, l2n - 1, twiddle, bitrev, 2, -1);
+    radix_2_fft_fix(data, l2n - 1, twiddle, bitrev, 2, -1);
 }

@@ -9,7 +9,8 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 set(CMAKE_C_STANDARD 99)
 
 # Add your source files here
-set(SOURCES    
+set(SOURCES  
+    fix_bitrev.c
     fix_fft.c
     fix_rfft.c
     fix_fft_core.c
