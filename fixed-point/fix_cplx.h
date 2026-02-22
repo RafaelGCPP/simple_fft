@@ -1,7 +1,4 @@
 #pragma once
-#if defined(__ARM_FEATURE_DSP)
-#include <arm_acle.h>
-#endif
 #include <stdint.h>
 
 // This is a fixed-point implementation of complex numbers.
@@ -35,21 +32,13 @@ static inline void fix_cplx_half(fix_cplx *x)
 // Return x + y.
 static inline fix_cplx fix_cplx_add(fix_cplx x, fix_cplx y)
 {
-#if defined(__ARM_FEATURE_DSP)
-    return (fix_cplx){ __qadd(x.real, y.real), __qadd(x.imag, y.imag) };
-#else
     return (fix_cplx){ x.real + y.real, x.imag + y.imag };
-#endif
 }
 
 // Return x - y.
 static inline fix_cplx fix_cplx_sub(fix_cplx x, fix_cplx y)
 {
-#if defined(__ARM_FEATURE_DSP)
-    return (fix_cplx){ __qsub(x.real, y.real), __qsub(x.imag, y.imag) };
-#else
     return (fix_cplx){x.real - y.real, x.imag - y.imag};
-#endif
 }
 
 // Return x * y using fixed-point fractional bits N.

@@ -1,9 +1,7 @@
 #include "fix_bitrev.h"
 #include "fix_cplx.h"
 #include <stdint.h>
-#if defined(__ARM_FEATURE_DSP)
-#include <arm_acle.h>
-#endif
+
 
 // Perform bit-reversal permutation on 2^l2n complex fixed-point samples.
 // l2n  - log2(n).
@@ -14,7 +12,7 @@ void fix_bitrev(int32_t *const data, int l2n, int *const bitrev_table)
     int n = 1 << l2n;
     fix_cplx *const cdata = (fix_cplx *)data;
 
-#if defined(__ARM_FEATURE_DSP)
+#if defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
     // Single-cycle RBIT instruction available: table is not needed.
     (void)bitrev_table; // suppress unused-parameter warning
     for (int i = 1; i < n - 1; i++)
