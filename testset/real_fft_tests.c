@@ -1,4 +1,5 @@
 #include "test_set.h"
+#include <stdint.h>
 
 void print_rfft(float *data, int n)
 {
@@ -62,9 +63,9 @@ void print_fix_rfft(int *data, int n)
 
 void real_fft_test_fix()
 {
-    int n = 16, l2n = 4;                                                   // Change this value for different sizes of the arrays (N)
-    int data[] = {1, 2, 3, 4, 5, 6, 7, 8, -8, -7, -6, -5, -4, -3, -2, -1}; // interleaved real and imaginary parts
-    int twiddle[n];
+    const int n = 16, l2n = 4;                                                   // Change this value for different sizes of the arrays (N)
+    int32_t data[] = {1, 2, 3, 4, 5, 6, 7, 8, -8, -7, -6, -5, -4, -3, -2, -1}; // interleaved real and imaginary parts
+    int32_t twiddle[n];
     int bitrev[n / 2];
 
     for (int i = 0; i < n; i++)

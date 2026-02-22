@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 void fixed_fft_benchmark()
 {
@@ -10,8 +11,8 @@ void fixed_fft_benchmark()
     puts("-=-=-=-=-=-= Real FFT benchmark - fixed point =-=-=-=-=-=-");
 
     int l2n, n;
-    int twiddle[2048];
-    int data[2048];
+    int32_t twiddle[2048];
+    int32_t data[2048];
     int bitrev[1024];
 
     puts("Generating sample data.");
